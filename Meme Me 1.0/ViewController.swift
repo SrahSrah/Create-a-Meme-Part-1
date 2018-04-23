@@ -27,44 +27,48 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        topTextField.delegate = self
-        bottomTextField.delegate = self
+        //Call to FormatTextField:
+        topTextField = FormatTextFields(textField: topTextField, text: "TOP")
+        bottomTextField = FormatTextFields(textField: bottomTextField, text: "BOTTOM")
+        
+        //Disables share button upon start up. Will be enabled once image chosen
+        shareButton.isEnabled = false
+    }
+    
+    // Formats text feilds:
+    func FormatTextFields(textField : UITextField, text : String) -> UITextField{
+        
+        textField.delegate = self
         
         let memeTextAttributes: [String: Any] = [
             NSAttributedStringKey.strokeColor.rawValue : UIColor.black,
             NSAttributedStringKey.foregroundColor.rawValue : UIColor.white,
             NSAttributedStringKey.font.rawValue : UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
             NSAttributedStringKey.strokeWidth.rawValue : -5,
-        ]
+            ]
         
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
+        textField.defaultTextAttributes = memeTextAttributes
         
-        topTextField.textAlignment = NSTextAlignment.center
-        bottomTextField.textAlignment = NSTextAlignment.center
-        topTextField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
-        bottomTextField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
+        textField.textAlignment = NSTextAlignment.center
+        textField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
         
         
-        topTextField.text = "TOP"
-        bottomTextField.text = "BOTTOM"
-    
-        topTextField.adjustsFontSizeToFitWidth = true
-        bottomTextField.adjustsFontSizeToFitWidth = true
+        textField.text = text
         
-        //Disables share button upon start up. Will be enabled once image chosen
-        shareButton.isEnabled = false
+        textField.adjustsFontSizeToFitWidth = true
+        
+        return textField
     }
     
     // Clears text if user is editing it for the first time, prevents deletion of user-entered text
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
-        if !didBeginEditingTop{
+        if topTextField.isEditing && !didBeginEditingTop{
             
             topTextField.text = ""
             didBeginEditingTop = true
-            
-        }else if !didBeginEditingBottom{
+ 
+        }else if bottomTextField.isEditing && !didBeginEditingBottom{
             
             bottomTextField.text = ""
             didBeginEditingBottom = true
@@ -134,24 +138,42 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     // MARK: User takes picture with camera
-    @IBAction func takeAPicture(_ sender: Any) {
+//    @IBAction func takeAPicture(_ sender: Any) {
+//
+//        let imagePickerController = UIImagePickerController()
+//        imagePickerController.delegate = self
+//        imagePickerController.sourceType = .camera
+//        present(imagePickerController, animated: true, completion: nil)
+//
+//    }
+//
+//    // MARK: user picks picture from photo library
+//    @IBAction func pickAPicture(_ sender: Any) {
+//
+//        let imagePickerController = UIImagePickerController()
+//        imagePickerController.delegate = self as UIImagePickerControllerDelegate & UINavigationControllerDelegate
+//        imagePickerController.sourceType = .photoLibrary
+//        present(imagePickerController, animated: true, completion: nil)
+//
+//
+//    }
+//
+   
+    @IBAction func pickAPicture(sender: UIBarButtonItem) {
         
         let imagePickerController = UIImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.sourceType = .camera
+
+        if sender.title == "Album"{
+            print("album accessesD")
+            
+            imagePickerController.delegate = self as UIImagePickerControllerDelegate & UINavigationControllerDelegate
+            imagePickerController.sourceType = .photoLibrary
+            
+        }else{
+            imagePickerController.delegate = self
+            imagePickerController.sourceType = .camera
+        }
         present(imagePickerController, animated: true, completion: nil)
-        
-    }
-    
-    // MARK: user picks picture from photo library
-    @IBAction func pickAPicture(_ sender: Any) {
-        
-        let imagePickerController = UIImagePickerController()
-        imagePickerController.delegate = self as UIImagePickerControllerDelegate & UINavigationControllerDelegate
-        imagePickerController.sourceType = .photoLibrary
-        present(imagePickerController, animated: true, completion: nil)
-        
-        
     }
     
     //Called when user picks an image:
@@ -216,7 +238,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         controller.completionWithItemsHandler = { activityType, completed, returnedItems, error in
             
             // Checks if user canceled the share action, and skips saving if so
-            if activityType != nil{
+            if completed{
                 self.save()
             }
             
