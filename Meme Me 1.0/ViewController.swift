@@ -137,43 +137,27 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
     }
     
-    // MARK: User takes picture with camera
-//    @IBAction func takeAPicture(_ sender: Any) {
-//
-//        let imagePickerController = UIImagePickerController()
-//        imagePickerController.delegate = self
-//        imagePickerController.sourceType = .camera
-//        present(imagePickerController, animated: true, completion: nil)
-//
-//    }
-//
-//    // MARK: user picks picture from photo library
-//    @IBAction func pickAPicture(_ sender: Any) {
-//
-//        let imagePickerController = UIImagePickerController()
-//        imagePickerController.delegate = self as UIImagePickerControllerDelegate & UINavigationControllerDelegate
-//        imagePickerController.sourceType = .photoLibrary
-//        present(imagePickerController, animated: true, completion: nil)
-//
-//
-//    }
-//
    
     @IBAction func pickAPicture(sender: UIBarButtonItem) {
         
-        let imagePickerController = UIImagePickerController()
-
         if sender.title == "Album"{
-            print("album accessesD")
             
-            imagePickerController.delegate = self as UIImagePickerControllerDelegate & UINavigationControllerDelegate
-            imagePickerController.sourceType = .photoLibrary
+            presentImagePickerController(.photoLibrary)
             
         }else{
-            imagePickerController.delegate = self
-            imagePickerController.sourceType = .camera
+            
+            presentImagePickerController(.camera)
         }
+    }
+    
+    // Presents ImagePickerController based on sourceType
+    func presentImagePickerController(_ sourceType: UIImagePickerControllerSourceType){
+        
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = sourceType
         present(imagePickerController, animated: true, completion: nil)
+        
     }
     
     //Called when user picks an image:
